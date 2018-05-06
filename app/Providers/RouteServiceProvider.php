@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-
+use App\Task;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -26,6 +26,8 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot();
+
+        app('router')->model('task', Task::class);
     }
 
     /**

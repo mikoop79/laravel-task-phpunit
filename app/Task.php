@@ -15,4 +15,20 @@ class Task extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeTasksLeft($query){
+
+        return $query->where('user_id', 1)->count();
+
+    }
+
+    public function getUserId(){
+
+
+    	$user = $this->user();
+
+    	return $user->id;
+    }
+
+    
 }
