@@ -7,7 +7,7 @@
     <body>
         <div class="container">
             <nav class="navbar navbar-default">
-                <h2>To Do List test</h2>
+                <h2>Laravel Test</h2>
             </nav>
         </div>
         @yield('content')

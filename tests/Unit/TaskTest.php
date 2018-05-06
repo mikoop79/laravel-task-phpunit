@@ -12,8 +12,15 @@ class TaskTest  extends TestCase
 {
 	use DatabaseMigrations;
 
+    private function loginUser(User $user){
+
+        Auth::login($user);
+    
+        return $user;
+    }
+
     /** @test */
-    function user_can_view_login_form()
+    function an_view_login_form()
     {
         
        $response = $this->get('/login');
@@ -22,7 +29,7 @@ class TaskTest  extends TestCase
 
     }
     /** @test */
-    function user_can_view_register_form()
+    function can_view_register_form()
     { 
        $response = $this->get('/register');
        $response->assertStatus(200);
@@ -61,9 +68,10 @@ class TaskTest  extends TestCase
             "name"=>'Joe Bloggs',
         ]);
 
-        Auth::login($user);
+        $user = $this->loginUser($user);
 
         $response = $this->get('/tasks');
+
         $response->assertStatus(200);
         $response->assertSee("Add Task");
         
@@ -77,7 +85,7 @@ class TaskTest  extends TestCase
             "name"=>'John Smith',
         ]);
 
-        Auth::login($user);
+        $user = $this->loginUser($user);
         $user = Auth::user();
         $task = $user->addTask("Task Name");
 
@@ -89,7 +97,7 @@ class TaskTest  extends TestCase
     function logged_out_user_can_not_add_task_throw_exception()
     {
         $this->disableExceptionHandling();
-        
+
         $user  = factory(User::class)->create([
             "name"=>'Joe Bloggs',
         ]);
@@ -97,8 +105,6 @@ class TaskTest  extends TestCase
         $user->addTask('do the shopping');
 
         $user->addTask('mow the lawn');
-
-        Auth::logout($user);
         
         try {
 
@@ -119,7 +125,6 @@ class TaskTest  extends TestCase
 
         $this->fail("You must be logged into create a task, there are " . $user->tasks()->tasksLeft() . " tasks for the user " . $user->name);
 
-
     }
 
     /** @test */
@@ -132,7 +137,7 @@ class TaskTest  extends TestCase
             "name"=>'John Smith',
         ]);
 
-        Auth::login($user);
+        $user = $this->loginUser($user);
 
         $task = $user->addTask('pay the phone bill');
 
