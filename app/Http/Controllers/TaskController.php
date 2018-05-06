@@ -33,7 +33,7 @@ class TaskController extends Controller
 
         } catch (AuthenticationException $e) {
 
-            return response()->json([], 422);
+            return flash()->success('You must be logged in to add a task');
         
         }
 
@@ -61,8 +61,10 @@ class TaskController extends Controller
 
         } catch (AuthenticationException $e) {
 
-            return response()->json([], 422);
+            return flash()->success('You must be logged in to add a task');
         
+        } catch (Exception $e){
+            return flash()->success('Task Failed to Delete.');
         }
 
 	    return redirect('/tasks');

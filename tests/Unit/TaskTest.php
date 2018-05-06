@@ -43,16 +43,12 @@ class TaskTest  extends TestCase
     {
         $this->disableExceptionHandling();
 
-        try {
-            $response = $this->json('GET', "/tasks/")->get(); 
+            $this->expectException(AuthenticationException::class);
 
-        } catch(AuthenticationException $e){
-
-            $response->assertResponseStatus(302);
+            $this->response = $this->json('GET', '/tasks'); 
+            
             return;
         
-        }
-
         $this->fail("Must be logged in to view your task list");        
 
     }
@@ -84,10 +80,9 @@ class TaskTest  extends TestCase
         Auth::login($user);
         $user = Auth::user();
         $task = $user->addTask("Task Name");
-        $amount = $user->tasks()->tasksLeft();
 
         $this->assertNotNull($task);
-        $this->assertEquals(1, $amount);
+        $this->assertEquals(1, $user->tasks()->tasksLeft());
     }
 
     /** @test */
@@ -103,7 +98,7 @@ class TaskTest  extends TestCase
 
         $user->addTask('mow the lawn');
 
-        Auth::login($user);
+        Auth::logout($user);
         
         try {
 
@@ -113,18 +108,37 @@ class TaskTest  extends TestCase
                 'user_id' => $user->id,
             ];
 
-            $response = $this->json('POST', "/task/", $params); 
-            $amount = $user->tasks()->tasksLeft();          
+            $response = $this->json('POST', "/task/", $params);    
 
         } catch (AuthenticationException $e) {
 
             $amount = $user->tasks()->tasksLeft();           
-            $this->assertEquals(2, $amount );
+            $this->assertEquals(2, $user->tasks()->tasksLeft());
             return;
         }
 
-        $this->fail("You must be logged into create a task, there are " . $amount . " tasks for the user " . $user->name);
+        $this->fail("You must be logged into create a task, there are " . $user->tasks()->tasksLeft() . " tasks for the user " . $user->name);
 
 
+    }
+
+    /** @test */
+    function user_can_delete_task()
+    {
+        $this->disableExceptionHandling();
+
+        // get new user
+        $user  = factory(User::class)->create([
+            "name"=>'John Smith',
+        ]);
+
+        Auth::login($user);
+
+        $task = $user->addTask('pay the phone bill');
+
+        $response = $this->json('POST', "/task/".$task->id, ['_token' => csrf_token(), '_method'=>'DELETE']);
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(0, $user->tasks()->TasksLeft());
     }
 }
