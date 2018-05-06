@@ -1,8 +1,8 @@
-#Laravel Task
+##Laravel Task
 
-### This is a test application built in Laravel 5.6 with tests for Adding Tasks
+This is a test application built in Laravel 5.6 with tests for Adding Tasks
 
-####Tests written
+Tests written
 
 - Add tasks
 - Remove tasks
